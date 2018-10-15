@@ -65,22 +65,22 @@ func (c Client) CreateGraph(username, token string, gi GraphInfo) error {
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type CreateGraphResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	cgres := CreateGraphResponse{}
-	err = json.Unmarshal(body, &cgres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !cgres.IsSuccess {
-		return errors.New(cgres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
 	return nil
 }
@@ -101,21 +101,21 @@ func (c Client) ListGraph(username, token string) ([]GraphInfo, error) {
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	type ListGraphResponse struct {
+	type ResponseBody struct {
 		Graphs []GraphInfo `json:"graphs"`
 	}
-	lgres := ListGraphResponse{}
-	err = json.Unmarshal(body, &lgres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return nil, err
 	}
 
-	return lgres.Graphs, nil
+	return body.Graphs, nil
 }
 
 //GetGraph get specific graphs's svg
@@ -167,22 +167,22 @@ func (c Client) UpdateGraph(username, token string, gi GraphInfo) error {
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type UpdateGraphResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	ugres := UpdateGraphResponse{}
-	err = json.Unmarshal(body, &ugres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !ugres.IsSuccess {
-		return errors.New(ugres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
 	return nil
 }
@@ -202,22 +202,22 @@ func (c Client) DeleteGraph(username, token, id string) error {
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type DeleteGraphResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	dgres := DeleteGraphResponse{}
-	err = json.Unmarshal(body, &dgres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !dgres.IsSuccess {
-		return errors.New(dgres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
 	return nil
 }

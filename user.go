@@ -10,24 +10,24 @@ import (
 
 //RegisterUser is register new user
 func (c Client) RegisterUser(username, token string, agree, notMinor string) error {
-	type registerInfo struct {
+	type RequestBody struct {
 		Username string `json:"username"`
 		Token    string `json:"token"`
 		Agree    string `json:"agreeTermsOfService"`
 		NotMinor string `json:"notMinor"`
 	}
-	ri := registerInfo{
+	rb := RequestBody{
 		Username: username,
 		Token:    token,
 		Agree:    agree,
 		NotMinor: notMinor,
 	}
-	riJSON, err := json.Marshal(ri)
+	rbJSON, err := json.Marshal(rb)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.URL+"/users", bytes.NewBuffer(riJSON))
+	req, err := http.NewRequest("POST", c.URL+"/users", bytes.NewBuffer(rbJSON))
 	if err != nil {
 		return err
 	}
@@ -39,40 +39,40 @@ func (c Client) RegisterUser(username, token string, agree, notMinor string) err
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type RegisterResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	rres := RegisterResponse{}
-	err = json.Unmarshal(body, &rres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !rres.IsSuccess {
-		return errors.New(rres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
 	return nil
 }
 
 //UpdateToken update user's token
 func (c Client) UpdateToken(username, oldToken, newToken string) error {
-	type updateInfo struct {
+	type RequestBody struct {
 		Token string `json:"newToken"`
 	}
-	ui := updateInfo{
+	rb := RequestBody{
 		Token: newToken,
 	}
-	uiJSON, err := json.Marshal(ui)
+	rbJSON, err := json.Marshal(rb)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", c.URL+"/users/"+username, bytes.NewBuffer(uiJSON))
+	req, err := http.NewRequest("PUT", c.URL+"/users/"+username, bytes.NewBuffer(rbJSON))
 	if err != nil {
 		return err
 	}
@@ -85,22 +85,22 @@ func (c Client) UpdateToken(username, oldToken, newToken string) error {
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type UpdateTokenResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	utres := UpdateTokenResponse{}
-	err = json.Unmarshal(body, &utres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !utres.IsSuccess {
-		return errors.New(utres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
 	return nil
 }
