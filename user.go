@@ -4,30 +4,36 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 //RegisterUser is register new user
-func (c Client) RegisterUser(username, token string, agree, notMinor string) error {
-	type registerInfo struct {
+func (c Client) RegisterUser(agree, notMinor string) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
+	type RequestBody struct {
 		Username string `json:"username"`
 		Token    string `json:"token"`
 		Agree    string `json:"agreeTermsOfService"`
 		NotMinor string `json:"notMinor"`
 	}
-	ri := registerInfo{
-		Username: username,
-		Token:    token,
+	rb := RequestBody{
+		Username: c.UserName,
+		Token:    c.Token,
 		Agree:    agree,
 		NotMinor: notMinor,
 	}
-	riJSON, err := json.Marshal(ri)
+	rbJSON, err := json.Marshal(rb)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.URL+"/users", bytes.NewBuffer(riJSON))
+	u := fmt.Sprintf("%s/users", c.URL)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(rbJSON))
 	if err != nil {
 		return err
 	}
@@ -39,45 +45,50 @@ func (c Client) RegisterUser(username, token string, agree, notMinor string) err
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type RegisterResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	rres := RegisterResponse{}
-	err = json.Unmarshal(body, &rres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !rres.IsSuccess {
-		return errors.New(rres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
 	return nil
 }
 
 //UpdateToken update user's token
-func (c Client) UpdateToken(username, oldToken, newToken string) error {
-	type updateInfo struct {
+func (c *Client) UpdateToken(newToken string) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
+	type RequestBody struct {
 		Token string `json:"newToken"`
 	}
-	ui := updateInfo{
+	rb := RequestBody{
 		Token: newToken,
 	}
-	uiJSON, err := json.Marshal(ui)
+	rbJSON, err := json.Marshal(rb)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", c.URL+"/users/"+username, bytes.NewBuffer(uiJSON))
+	u := fmt.Sprintf("%s/users/%s", c.URL, c.UserName)
+	req, err := http.NewRequest("PUT", u, bytes.NewBuffer(rbJSON))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-USER-TOKEN", oldToken)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
@@ -85,33 +96,39 @@ func (c Client) UpdateToken(username, oldToken, newToken string) error {
 	if res.StatusCode != http.StatusOK {
 		return errors.New("return status code: " + res.Status)
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	bodyJSON, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
 
-	type UpdateTokenResponse struct {
+	type ResponseBody struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	utres := UpdateTokenResponse{}
-	err = json.Unmarshal(body, &utres)
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
 	if err != nil {
 		return err
 	}
-	if !utres.IsSuccess {
-		return errors.New(utres.Message)
+	if !body.IsSuccess {
+		return errors.New(body.Message)
 	}
+	c.Token = newToken
 	return nil
 }
 
 //DeleteUser delete registered user
-func (c Client) DeleteUser(username, token string) error {
-	req, err := http.NewRequest("DELETE", c.URL+"/users/"+username, nil)
+func (c Client) DeleteUser() error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
+	u := fmt.Sprintf("%s/users/%s", c.URL, c.UserName)
+	req, err := http.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err

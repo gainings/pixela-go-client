@@ -6,13 +6,9 @@ import (
 )
 
 func TestCreateGraph(t *testing.T) {
-	c := NewClient()
-	//Initialize test account
-	c.DeleteUser("test-gainings", "testtest")
-	c.DeleteUser("test-gainings", "testhogehoge")
-	c.DeleteGraph("test-gainings", "testtest", "hoge1")
-	c.DeleteGraph("test-gainings", "testtest", "hoge2")
-	c.RegisterUser("test-gainings", "testtest", "yes", "yes")
+	c := NewClient("test-gainings", "testtest")
+	c.RegisterUser("yes", "yes")
+	defer c.DeleteUser()
 
 	gi1 := GraphInfo{
 		ID:   "hoge1",
@@ -38,7 +34,7 @@ func TestCreateGraph(t *testing.T) {
 		t.Fatalf("want nil, but got %v", err)
 	}
 
-	err = c.CreateGraph("test-gainings", "testtest", gi1)
+	err = c.CreateGraph(gi1)
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
@@ -50,12 +46,12 @@ func TestCreateGraph(t *testing.T) {
 		UnitType: "float",
 		Color:    "shibafu",
 	}
-	err = c.CreateGraph("test-gainings", "testtest", gi2)
+	err = c.CreateGraph(gi2)
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
 
-	gs, err := c.ListGraph("test-gainings", "testtest")
+	gs, err := c.ListGraph()
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
@@ -69,12 +65,12 @@ func TestCreateGraph(t *testing.T) {
 		t.Fatalf("want %#v, but got %#v", gs[1], gi2)
 	}
 
-	_, err = c.GetGraph("test-gainings", "testtest", "hoge3", "")
+	_, err = c.GetGraph("hoge3", "")
 	if err == nil {
 		t.Fatalf("want error, got nil")
 	}
 
-	svg, err := c.GetGraph("test-gainings", "testtest", "hoge2", "")
+	svg, err := c.GetGraph("hoge2", "")
 	if err != nil {
 		t.Fatalf("want nil, got %v", err)
 	}
@@ -96,20 +92,19 @@ func TestCreateGraph(t *testing.T) {
 		UnitType: "int",
 		Color:    "shibafu",
 	}
-	err = c.UpdateGraph("test-gainings", "testtest", newGi1)
+	err = c.UpdateGraph(newGi1)
 	if err != nil {
 		t.Fatalf("want nil, got %v", err)
 	}
-	err = c.UpdateGraph("test-gainings", "testtest", newGi2)
+	err = c.UpdateGraph(newGi2)
 	if err != nil {
 		t.Fatalf("want nil, got %v", err)
 	}
-	gs, err = c.ListGraph("test-gainings", "testtest")
+	gs, err = c.ListGraph()
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
 	if !reflect.DeepEqual(gs[0], newGi1) {
 		t.Fatalf("want %#v, but got %#v", gs[0], newGi1)
 	}
-	c.DeleteUser("test-gainings", "testtest")
 }

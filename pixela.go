@@ -11,14 +11,18 @@ const baseURL = "https://pixe.la/v1"
 type Client struct {
 	HTTPClient http.Client
 	URL        string
+	UserName   string
+	Token      string
 }
 
 //NewClient is return Cilent
-func NewClient() *Client {
+func NewClient(userName, token string) *Client {
 	return &Client{
 		HTTPClient: http.Client{
 			Timeout: time.Duration(10) * time.Second,
 		},
-		URL: baseURL,
+		URL:      baseURL,
+		UserName: userName,
+		Token:    token,
 	}
 }
