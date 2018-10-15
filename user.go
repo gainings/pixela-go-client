@@ -4,12 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 //RegisterUser is register new user
-func (c Client) RegisterUser(username, token string, agree, notMinor string) error {
+func (c Client) RegisterUser(agree, notMinor string) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
 	type RequestBody struct {
 		Username string `json:"username"`
 		Token    string `json:"token"`
@@ -17,8 +22,8 @@ func (c Client) RegisterUser(username, token string, agree, notMinor string) err
 		NotMinor string `json:"notMinor"`
 	}
 	rb := RequestBody{
-		Username: username,
-		Token:    token,
+		Username: c.UserName,
+		Token:    c.Token,
 		Agree:    agree,
 		NotMinor: notMinor,
 	}
@@ -27,7 +32,8 @@ func (c Client) RegisterUser(username, token string, agree, notMinor string) err
 		return err
 	}
 
-	req, err := http.NewRequest("POST", c.URL+"/users", bytes.NewBuffer(rbJSON))
+	u := fmt.Sprintf("%s/users", c.URL)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(rbJSON))
 	if err != nil {
 		return err
 	}
@@ -60,7 +66,11 @@ func (c Client) RegisterUser(username, token string, agree, notMinor string) err
 }
 
 //UpdateToken update user's token
-func (c Client) UpdateToken(username, oldToken, newToken string) error {
+func (c *Client) UpdateToken(newToken string) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
 	type RequestBody struct {
 		Token string `json:"newToken"`
 	}
@@ -72,12 +82,13 @@ func (c Client) UpdateToken(username, oldToken, newToken string) error {
 		return err
 	}
 
-	req, err := http.NewRequest("PUT", c.URL+"/users/"+username, bytes.NewBuffer(rbJSON))
+	u := fmt.Sprintf("%s/users/%s", c.URL, c.UserName)
+	req, err := http.NewRequest("PUT", u, bytes.NewBuffer(rbJSON))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-USER-TOKEN", oldToken)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
@@ -102,16 +113,22 @@ func (c Client) UpdateToken(username, oldToken, newToken string) error {
 	if !body.IsSuccess {
 		return errors.New(body.Message)
 	}
+	c.Token = newToken
 	return nil
 }
 
 //DeleteUser delete registered user
-func (c Client) DeleteUser(username, token string) error {
-	req, err := http.NewRequest("DELETE", c.URL+"/users/"+username, nil)
+func (c Client) DeleteUser() error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
+	u := fmt.Sprintf("%s/users/%s", c.URL, c.UserName)
+	req, err := http.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err

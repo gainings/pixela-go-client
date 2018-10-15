@@ -45,19 +45,23 @@ func (gi GraphInfo) Validate() error {
 }
 
 //CreateGraph create new graph
-func (c Client) CreateGraph(username, token string, gi GraphInfo) error {
+func (c Client) CreateGraph(gi GraphInfo) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
 	giJSON, err := json.Marshal(gi)
 	if err != nil {
 		return err
 	}
 
-	u := fmt.Sprintf("%s/users/%s/graphs", c.URL, username)
+	u := fmt.Sprintf("%s/users/%s/graphs", c.URL, c.UserName)
 	req, err := http.NewRequest("POST", u, bytes.NewBuffer(giJSON))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
@@ -86,14 +90,18 @@ func (c Client) CreateGraph(username, token string, gi GraphInfo) error {
 }
 
 //ListGraph return User's graph info list
-func (c Client) ListGraph(username, token string) ([]GraphInfo, error) {
-	u := fmt.Sprintf("%s/users/%s/graphs", c.URL, username)
+func (c Client) ListGraph() ([]GraphInfo, error) {
+	if c.UserName == "" || c.Token == "" {
+		return nil, errors.New("Plz set user information in Client")
+	}
+
+	u := fmt.Sprintf("%s/users/%s/graphs", c.URL, c.UserName)
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -119,13 +127,17 @@ func (c Client) ListGraph(username, token string) ([]GraphInfo, error) {
 }
 
 //GetGraph get specific graphs's svg
-func (c Client) GetGraph(username, token, id, date string) (string, error) {
-	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, username, id)
+func (c Client) GetGraph(id, date string) (string, error) {
+	if c.UserName == "" || c.Token == "" {
+		return "", errors.New("Plz set user information in Client")
+	}
+
+	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, c.UserName, id)
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	if date != "" {
 		q := req.URL.Query()
 		q.Add("date", date)
@@ -147,19 +159,23 @@ func (c Client) GetGraph(username, token, id, date string) (string, error) {
 }
 
 //UpdateGraph update specific graphs's information
-func (c Client) UpdateGraph(username, token string, gi GraphInfo) error {
+func (c Client) UpdateGraph(gi GraphInfo) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
 	giJSON, err := json.Marshal(gi)
 	if err != nil {
 		return err
 	}
 
-	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, username, gi.ID)
+	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, c.UserName, gi.ID)
 	req, err := http.NewRequest("PUT", u, bytes.NewBuffer(giJSON))
 	if err != nil {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
@@ -188,13 +204,17 @@ func (c Client) UpdateGraph(username, token string, gi GraphInfo) error {
 }
 
 //DeleteGraph delete specific graphs
-func (c Client) DeleteGraph(username, token, id string) error {
-	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, username, id)
+func (c Client) DeleteGraph(id string) error {
+	if c.UserName == "" || c.Token == "" {
+		return errors.New("Plz set user information in Client")
+	}
+
+	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, c.UserName, id)
 	req, err := http.NewRequest("DELETE", u, nil)
 	if err != nil {
 		return err
 	}
-	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("X-USER-TOKEN", c.Token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err

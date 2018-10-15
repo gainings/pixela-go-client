@@ -5,42 +5,34 @@ import (
 )
 
 func TestRegisterUser(t *testing.T) {
-	c := NewClient()
-	//Initialize test account
-	c.DeleteUser("test-gainings", "testtest")
-	c.DeleteUser("test-gainings", "testhogehoge")
+	c := NewClient("test-gainings", "testtest")
 
-	err := c.RegisterUser("test-gainings", "testtest", "no", "yes")
+	err := c.RegisterUser("no", "yes")
 	if err == nil {
 		t.Fatalf("want err, but got nil")
 	}
 
-	err = c.RegisterUser("test-gainings", "testtest", "yes", "no")
+	err = c.RegisterUser("yes", "no")
 	if err == nil {
 		t.Fatalf("want err, but got nil")
 	}
 
-	err = c.RegisterUser("test-gainings", "testtest", "yes", "yes")
+	err = c.RegisterUser("yes", "yes")
 	if err != nil {
 		t.Fatalf("want nil, got %#v", err)
 	}
-	err = c.RegisterUser("test-gainings", "testtest", "yes", "yes")
+	err = c.RegisterUser("yes", "yes")
 	if err == nil {
 		t.Fatalf("want err, but got nil")
 	}
 
-	err = c.UpdateToken("test-gainings", "testtest", "testhogehoge")
+	err = c.UpdateToken("testhogehoge")
 	if err != nil {
 		t.Errorf("want nil, got %v", err)
 	}
 
-	err = c.DeleteUser("test-gainings", "testtest")
-	if err == nil {
-		t.Fatalf("want err, but got nil")
-	}
-
-	err = c.DeleteUser("test-gainings", "testhogehoge")
+	err = c.DeleteUser()
 	if err != nil {
-		t.Errorf("want nil, got %v", err)
+		t.Fatalf("want nil, but got %v", err)
 	}
 }
