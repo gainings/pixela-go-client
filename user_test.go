@@ -22,7 +22,7 @@ func TestRegisterUser(t *testing.T) {
 
 	err = c.RegisterUser("test-gainings", "testtest", "yes", "yes")
 	if err != nil {
-		t.Errorf("want nil, got %#v", err)
+		t.Fatalf("want nil, got %#v", err)
 	}
 	err = c.RegisterUser("test-gainings", "testtest", "yes", "yes")
 	if err == nil {
