@@ -1,8 +1,8 @@
-# pixela-go-sdk
+# pixela-go-client
 
-pixela-go-sdk is unofficial api client for [pixe.la](https://pixe.la/)
+pixela-go-client is unofficial api client for [pixe.la](https://pixe.la/)
 
-[GoDoc](https://godoc.org/github.com/gainings/pixela-go-sdk)
+[GoDoc](https://godoc.org/github.com/gainings/pixela-go-client)
 
 I need review. plz check code and make Issue and PullRequest!
 
@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	user := "test-pixela-sdk"
+	user := "test-pixela-client"
 	pass := "testtest"
 	c := pixela.NewClient(user, pass)
 
