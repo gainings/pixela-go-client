@@ -4,27 +4,27 @@ import (
 	"testing"
 )
 
-func TestRegister(t *testing.T) {
+func TestRegisterUser(t *testing.T) {
 	c := NewClient()
 	//Initialize test account
 	c.DeleteUser("test-gainings", "testtest")
 	c.DeleteUser("test-gainings", "testhogehoge")
 
-	err := c.Register("test-gainings", "testtest", "no", "yes")
+	err := c.RegisterUser("test-gainings", "testtest", "no", "yes")
 	if err == nil {
 		t.Fatalf("want err, but got nil")
 	}
 
-	err = c.Register("test-gainings", "testtest", "yes", "no")
+	err = c.RegisterUser("test-gainings", "testtest", "yes", "no")
 	if err == nil {
 		t.Fatalf("want err, but got nil")
 	}
 
-	err = c.Register("test-gainings", "testtest", "yes", "yes")
+	err = c.RegisterUser("test-gainings", "testtest", "yes", "yes")
 	if err != nil {
 		t.Errorf("want nil, got %#v", err)
 	}
-	err = c.Register("test-gainings", "testtest", "yes", "yes")
+	err = c.RegisterUser("test-gainings", "testtest", "yes", "yes")
 	if err == nil {
 		t.Fatalf("want err, but got nil")
 	}
