@@ -19,6 +19,14 @@ func TestRegister(t *testing.T) {
 
 	err = c.Register("test-user"+time.Now().String(), "testtest", "yes", "yes")
 	if err != nil {
-		t.Fatalf("want nil, got %#v", err)
+		t.Errorf("want nil, got %#v", err)
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	c := NewClient()
+	err := c.UpdateToken("test-gainings", "testtest", "testhogehoge")
+	if err != nil {
+		t.Errorf("want nil, got %v", err)
 	}
 }
