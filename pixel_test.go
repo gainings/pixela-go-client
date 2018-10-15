@@ -28,7 +28,7 @@ func TestPixel(t *testing.T) {
 	}
 	defer c.DeleteGraph("test-gainings", "testtest", "hoge1")
 
-	err = c.DrawPixel("test-gainings", "testtest", "hoge1", "20181015", "5.5")
+	err = c.RegisterPixel("test-gainings", "testtest", "hoge1", "20181015", "5.5")
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}

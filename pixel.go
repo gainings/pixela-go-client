@@ -9,8 +9,8 @@ import (
 	"net/http"
 )
 
-//DrawPixel draw specific pixel
-func (c Client) DrawPixel(username, token string, id, date, quantity string) error {
+//RegisterPixel Register specific pixel
+func (c Client) RegisterPixel(username, token string, id, date, quantity string) error {
 	type RequestBody struct {
 		Date     string `json:"date"`
 		Quantity string `json:"quantity"`
@@ -89,7 +89,7 @@ func (c Client) GetPixelQuantity(username, token string, id, date string) (float
 	return body.Quantity, nil
 }
 
-//UpdatePixelQuantity update quantity for already drawed pixel
+//UpdatePixelQuantity update quantity for already registered pixel
 func (c Client) UpdatePixelQuantity(username, token string, id, date, quantity string) error {
 	type RequestBody struct {
 		Quantity string `json:"quantity"`
@@ -180,6 +180,41 @@ func (c Client) DecrementPixelQuantity(username, token string, id string) error 
 	}
 	req.Header.Set("X-USER-TOKEN", token)
 	req.Header.Set("Content-Length", "0")
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		return errors.New("return status code: " + res.Status)
+	}
+	bodyJSON, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	type ResponseBody struct {
+		Message   string `json:"message"`
+		IsSuccess bool   `json:"isSuccess"`
+	}
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
+	if err != nil {
+		return err
+	}
+	if !body.IsSuccess {
+		return errors.New(body.Message)
+	}
+	return nil
+}
+
+//DeletePixelQuantity dlete quantity for already registered pixel
+func (c Client) DeletePixelQuantity(username, token string, id, date, quantity string) error {
+	u := fmt.Sprintf("%s/users/%s/graphs/%s/%s", c.URL, username, id, date)
+	req, err := http.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("X-USER-TOKEN", token)
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return err
