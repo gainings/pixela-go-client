@@ -38,4 +38,15 @@ func TestPixel(t *testing.T) {
 	if quantity != 5.5 {
 		t.Fatalf("want 5.5, but got %v", quantity)
 	}
+	err = c.UpdatePixelQuantity("test-gainings", "testtest", "hoge1", "20181015", "3.14")
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	quantity, err = c.GetPixelQuantity("test-gainings", "testtest", "hoge1", "20181015")
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	if quantity != 3.14 {
+		t.Fatalf("want 3.14, but got %v", quantity)
+	}
 }
