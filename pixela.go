@@ -78,7 +78,7 @@ func (c Client) Register(username, token string, agree, notMinor string) error {
 	return nil
 }
 
-//UpdateToken is update user's token
+//UpdateToken update user's token
 func (c Client) UpdateToken(username, oldToken, newToken string) error {
 	type updateInfo struct {
 		Token string `json:"newToken"`
@@ -109,17 +109,51 @@ func (c Client) UpdateToken(username, oldToken, newToken string) error {
 		return err
 	}
 
-	type RegisterResponse struct {
+	type UpdateTokenResponse struct {
 		Message   string `json:"message"`
 		IsSuccess bool   `json:"isSuccess"`
 	}
-	rres := RegisterResponse{}
-	err = json.Unmarshal(body, &rres)
+	utres := UpdateTokenResponse{}
+	err = json.Unmarshal(body, &utres)
 	if err != nil {
 		return err
 	}
-	if !rres.IsSuccess {
-		return errors.New(rres.Message)
+	if !utres.IsSuccess {
+		return errors.New(utres.Message)
+	}
+	return nil
+}
+
+//DeleteUser delete registered user
+func (c Client) DeleteUser(username, token string) error {
+	req, err := http.NewRequest("DELETE", c.URL+"/users/"+username, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("X-USER-TOKEN", token)
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		return errors.New("return status code: " + res.Status)
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	type DeleteUserResponse struct {
+		Message   string `json:"message"`
+		IsSuccess bool   `json:"isSuccess"`
+	}
+	dures := DeleteUserResponse{}
+	err = json.Unmarshal(body, &dures)
+	if err != nil {
+		return err
+	}
+	if !dures.IsSuccess {
+		return errors.New(dures.Message)
 	}
 	return nil
 }
