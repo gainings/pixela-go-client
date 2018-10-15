@@ -134,3 +134,75 @@ func (c Client) UpdatePixelQuantity(username, token string, id, date, quantity s
 	}
 	return nil
 }
+
+//IncrementPixelQuantity increment quantity of the Day
+func (c Client) IncrementPixelQuantity(username, token string, id string) error {
+	u := fmt.Sprintf("%s/users/%s/graphs/%s/increment", c.URL, username, id)
+	req, err := http.NewRequest("PUT", u, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("Content-Length", "0")
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		return errors.New("return status code: " + res.Status)
+	}
+	bodyJSON, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	type ResponseBody struct {
+		Message   string `json:"message"`
+		IsSuccess bool   `json:"isSuccess"`
+	}
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
+	if err != nil {
+		return err
+	}
+	if !body.IsSuccess {
+		return errors.New(body.Message)
+	}
+	return nil
+}
+
+//DecrementPixelQuantity decrement quantity of the Day
+func (c Client) DecrementPixelQuantity(username, token string, id string) error {
+	u := fmt.Sprintf("%s/users/%s/graphs/%s/decrement", c.URL, username, id)
+	req, err := http.NewRequest("PUT", u, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("X-USER-TOKEN", token)
+	req.Header.Set("Content-Length", "0")
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		return errors.New("return status code: " + res.Status)
+	}
+	bodyJSON, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	type ResponseBody struct {
+		Message   string `json:"message"`
+		IsSuccess bool   `json:"isSuccess"`
+	}
+	body := ResponseBody{}
+	err = json.Unmarshal(bodyJSON, &body)
+	if err != nil {
+		return err
+	}
+	if !body.IsSuccess {
+		return errors.New(body.Message)
+	}
+	return nil
+}

@@ -2,6 +2,7 @@ package pixela
 
 import (
 	"testing"
+	"time"
 )
 
 func TestPixel(t *testing.T) {
@@ -48,5 +49,33 @@ func TestPixel(t *testing.T) {
 	}
 	if quantity != 3.14 {
 		t.Fatalf("want 3.14, but got %v", quantity)
+	}
+
+	today := time.Now().Format("20060102")
+	err = c.UpdatePixelQuantity("test-gainings", "testtest", "hoge1", today, "1.0")
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	err = c.IncrementPixelQuantity("test-gainings", "testtest", "hoge1")
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	quantity, err = c.GetPixelQuantity("test-gainings", "testtest", "hoge1", today)
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	if quantity != 1.01 {
+		t.Fatalf("want 2, but got %v", quantity)
+	}
+	err = c.DecrementPixelQuantity("test-gainings", "testtest", "hoge1")
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	quantity, err = c.GetPixelQuantity("test-gainings", "testtest", "hoge1", today)
+	if err != nil {
+		t.Fatalf("want nil, but got %v", err)
+	}
+	if quantity != 1.0 {
+		t.Fatalf("want 1, but got %v", quantity)
 	}
 }
