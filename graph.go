@@ -84,3 +84,36 @@ func (c Client) CreateGraph(username, token string, gi GraphInfo) error {
 	}
 	return nil
 }
+
+//ListGraph return User's graph info list
+func (c Client) ListGraph(username, token string) ([]GraphInfo, error) {
+	u := fmt.Sprintf("%s/users/%s/graphs", c.URL, username)
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-USER-TOKEN", token)
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != http.StatusOK {
+		return nil, errors.New("return status code: " + res.Status)
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	type ListGraphResponse struct {
+		Graphs []GraphInfo `json:"graphs"`
+	}
+	lgres := ListGraphResponse{}
+	err = json.Unmarshal(body, &lgres)
+	if err != nil {
+		return nil, err
+	}
+
+	return lgres.Graphs, nil
+}
