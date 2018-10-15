@@ -117,3 +117,31 @@ func (c Client) ListGraph(username, token string) ([]GraphInfo, error) {
 
 	return lgres.Graphs, nil
 }
+
+//GetGraph get specific graphs's svg url
+func (c Client) GetGraph(username, token, id, date string) (string, error) {
+	u := fmt.Sprintf("%s/users/%s/graphs/%s", c.URL, username, id)
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("X-USER-TOKEN", token)
+	if date != "" {
+		q := req.URL.Query()
+		q.Add("date", date)
+		req.URL.RawQuery = q.Encode()
+	}
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode != http.StatusOK {
+		return "", errors.New("return status code: " + res.Status)
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}

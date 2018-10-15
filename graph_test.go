@@ -63,4 +63,17 @@ func TestCreateGraph(t *testing.T) {
 	if !reflect.DeepEqual(gs[0], gi1) {
 		t.Fatalf("want %#v, but got %#v", gs[0], gi1)
 	}
+
+	_, err = c.GetGraph("test-gainings", "testtest", "hoge3", "")
+	if err == nil {
+		t.Fatalf("want error, got nil")
+	}
+
+	svg, err := c.GetGraph("test-gainings", "testtest", "hoge2", "")
+	if err != nil {
+		t.Fatalf("want nil, got %v", err)
+	}
+	if svg == "" {
+		t.Fatalf("want svg url")
+	}
 }
