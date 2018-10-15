@@ -1,0 +1,20 @@
+sudo: false
+
+language: go
+
+go:
+  - '1.8.x'
+  - '1.9.x'
+  - '1.10.x'
+  - 'tip'
+
+script:
+ - go vet ./...
+ - go test -v ./...
+ - make setup
+
+notifications:
+  email: false
+
+after_success:
+  - if [ "$TRAVIS_GO_VERSION" = "tip" ]; then test -n "$TRAVIS_TAG" && script/release.sh; fi
