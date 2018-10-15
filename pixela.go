@@ -16,11 +16,13 @@ type Client struct {
 }
 
 //NewClient is return Cilent
-func NewClient() *Client {
+func NewClient(userName, token string) *Client {
 	return &Client{
 		HTTPClient: http.Client{
 			Timeout: time.Duration(10) * time.Second,
 		},
-		URL: baseURL,
+		URL:      baseURL,
+		UserName: userName,
+		Token:    token,
 	}
 }
