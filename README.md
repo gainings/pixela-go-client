@@ -16,7 +16,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gainings/pixela"
+	"github.com/gainings/pixela-go-client"
 )
 
 func main() {
