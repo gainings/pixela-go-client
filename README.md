@@ -71,6 +71,9 @@ func main() {
 	}
 
 	q, err := c.GetPixelQuantity(gi.ID, today)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(q)
 }
 ```
