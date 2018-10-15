@@ -8,7 +8,7 @@ I need review. plz check code and make Issue and PullRequest!
 
 ## example
 
-```
+```go
 package main
 
 import (
