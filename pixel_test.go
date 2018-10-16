@@ -2,13 +2,14 @@ package pixela
 
 import (
 	"testing"
-	"time"
 )
 
 func TestPixel(t *testing.T) {
 	c := NewClient("test-gainings", "testtest")
 	c.RegisterUser("yes", "yes")
 	defer c.DeleteUser()
+
+	today := "20181015"
 
 	gi1 := GraphInfo{
 		ID:       "hoge1",
@@ -23,22 +24,22 @@ func TestPixel(t *testing.T) {
 	}
 	defer c.DeleteGraph("hoge1")
 
-	err = c.RegisterPixel("hoge1", "20181015", "5.5")
+	err = c.RegisterPixel("hoge1", today, "5.5")
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
-	quantity, err := c.GetPixelQuantity("hoge1", "20181015")
+	quantity, err := c.GetPixelQuantity("hoge1", today)
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
 	if quantity != 5.5 {
 		t.Fatalf("want 5.5, but got %v", quantity)
 	}
-	err = c.UpdatePixelQuantity("hoge1", "20181015", "3.14")
+	err = c.UpdatePixelQuantity("hoge1", today, "3.14")
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
-	quantity, err = c.GetPixelQuantity("hoge1", "20181015")
+	quantity, err = c.GetPixelQuantity("hoge1", today)
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
@@ -46,7 +47,6 @@ func TestPixel(t *testing.T) {
 		t.Fatalf("want 3.14, but got %v", quantity)
 	}
 
-	today := time.Now().Format("20060102")
 	err = c.UpdatePixelQuantity("hoge1", today, "1.0")
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
@@ -74,7 +74,7 @@ func TestPixel(t *testing.T) {
 		t.Fatalf("want 1, but got %v", quantity)
 	}
 
-	err = c.DeletePixelQuantity("hoge1", "20181015")
+	err = c.DeletePixelQuantity("hoge1", today)
 	if err != nil {
 		t.Fatalf("want nil, but got %v", err)
 	}
