@@ -8,7 +8,7 @@ I need review. plz check code and make Issue and PullRequest!
 
 ## example
 
-```
+```go
 package main
 
 import (
@@ -16,7 +16,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gainings/pixela"
+	"github.com/gainings/pixela-go-client"
 )
 
 func main() {
@@ -55,22 +55,25 @@ func main() {
 	//register pixel with quantity in graph
 	today := time.Now().Format("20060102")
 	fmt.Println(today)
-	err = c.RegisterPixel("hoge1", today, "5")
+	err = c.RegisterPixel(gi.ID, today, "5")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = c.IncrementPixelQuantity("hoge1")
+	err = c.IncrementPixelQuantity(gi.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = c.DecrementPixelQuantity("hoge1")
+	err = c.DecrementPixelQuantity(gi.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	q, err := c.GetPixelQuantity(gi.ID, today)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(q)
 }
 ```
