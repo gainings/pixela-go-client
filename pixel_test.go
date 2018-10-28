@@ -2,6 +2,7 @@ package pixela
 
 import (
 	"testing"
+	"time"
 )
 
 func TestPixel(t *testing.T) {
@@ -9,7 +10,9 @@ func TestPixel(t *testing.T) {
 	c.RegisterUser("yes", "yes")
 	defer c.DeleteUser()
 
-	today := "20181015"
+	now := time.Now().UTC()
+	const layout = "20060102"
+	today := now.Format(layout)
 
 	gi1 := GraphInfo{
 		ID:       "hoge1",
